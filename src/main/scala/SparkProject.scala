@@ -96,6 +96,11 @@ object SparkProject extends App{
     dfPop.show()
     
     val writer = new PrintWriter(new File("output.csv"))
+    var headers = dfPop.select("Category").distinct()
+                       .map(r => r.getString(0) + " mean, " + r.getString(0) + " variance")
+                       .collect.toList
+    writer.write("ratio," + headers.mkString(",") + "\n")
+    
     for (ratio <- 0.25 until 1.0 by 0.25){
       println(s"ratio = $ratio")
       // Step 4. Create the sample for bootstrapping.
@@ -115,7 +120,7 @@ object SparkProject extends App{
     // Step 8. Draw a graph with x-axis percentage
     writer.close()
     val out = sqlContext.read.format("com.databricks.spark.csv")
-                        .option("header", "false").option("inferSchema", "true").load("file:///cs522/output.csv")
+                        .option("header", "true").option("inferSchema", "true").load("file:///cs522/output.csv")
     out.show
     
   }
