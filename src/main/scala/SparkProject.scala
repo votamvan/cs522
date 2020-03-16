@@ -95,7 +95,8 @@ object SparkProject extends App{
     val dfPop = computeMeanVarianceByCategory(population)
     dfPop.show()
     
-    val writer = new PrintWriter(new File("output.csv"))
+    val file = new File("output.csv")
+    val writer = new PrintWriter(file)
     var headers = dfPop.select("Category").distinct()
                        .map(r => r.getString(0) + " mean, " + r.getString(0) + " variance")
                        .collect.toList
@@ -120,7 +121,9 @@ object SparkProject extends App{
     // Step 8. Draw a graph with x-axis percentage
     writer.close()
     val out = sqlContext.read.format("com.databricks.spark.csv")
-                        .option("header", "true").option("inferSchema", "true").load("file:///cs522/output.csv")
+                        .option("header", "true").option("inferSchema", "true")
+                        .load("file://" + file.getAbsolutePath())
+    println("=== Absolute error percentage by ratio  ===")
     out.show
     
   }
